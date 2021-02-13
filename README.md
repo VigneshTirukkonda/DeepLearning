@@ -4,4 +4,4 @@
 
 Project 1: MNIST
 
-Remote update
+
