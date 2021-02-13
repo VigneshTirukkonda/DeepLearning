@@ -12,8 +12,6 @@ if __name__ == "__main__":
     Optmizer = optim.SGD(Model.parameters(), lr= config.LR, momentum= config.MOMENTUM)
     # Model.load_state_dict(torch.load(config.MODEL_PATH))
 
-
-
     for epoch in tqdm(range(config.EPOCHS)):
         print('Epoch {} Loss: {}'.format(epoch, engine.train_fn(dataset.TRAIN_DL, Model, Optmizer, 'CPU')))
 
