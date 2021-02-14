@@ -8,7 +8,7 @@ transform = tv.transforms.Compose([
     ])
 
 
-TRAIN_DS, VALID_DS = data.random_split(tv.datasets.MNIST(root= config.ROOT, download= True, transform= transform), [50000, 10000])
+TRAIN_DS, VALID_DS = data.random_split(tv.datasets.MNIST(root= config.ROOT, download= True, transform= transform), config.SPLIT)
 
 TRAIN_DL = data.DataLoader(dataset= TRAIN_DS, batch_size= config.BATCH_SIZE, shuffle= True)
 VALID_DL = data.DataLoader(dataset= VALID_DS)

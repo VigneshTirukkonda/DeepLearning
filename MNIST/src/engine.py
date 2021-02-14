@@ -24,6 +24,5 @@ def eval_fn(data_loader, model):
         loss.backward()
         total_loss += loss.item()
 
-def cross_validate(data_loader, model):
-    model.eval()
+
     
