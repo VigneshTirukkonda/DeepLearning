@@ -4,41 +4,37 @@ from flask_jsglue import JSGlue
 import config
 import model
 import torch
+from torchvision import transforms
+import requests
 
-Model = model.CNN()
-Model.load_state_dict(torch.load(config.MODEL_PATH + config.LATEST_MODEL))
+# img_transform = transforms.Compose([
+#     transforms.Resize((28, 28)),
+#     transforms.ToTensor(),
+#     transforms.Lambda(lambda x: torch.unsqueeze(x, 0)),
+#     transforms.Normalize([0.5, ],[0.5, ])
+#     ])
+
+
+# Model = model.CNNJS(img_transform)
+# Model.load_state_dict(torch.load(config.MODEL_PATH + config.LATEST_MODEL))
 
 app = Flask(__name__)
 jsglue = JSGlue(app)
 
-def transform_image(image_bytes):
-    my_transforms = transforms.Compose([
-        transforms.Resize((28, 28)),
-        transforms.ToTensor(),
-        transforms.Lambda(lambda x: torch.unsqueeze(x, 0)),
-        transforms.Normalize([0.5, ],[0.5, ])
-        ])
-    image = Image.open(io.BytesIO(image_bytes))
-    return my_transforms(image)
-
-
-def get_prediction(image_bytes):
-    tensor = transform_image(image_bytes=image_bytes)
-    outputs = Model.forward(tensor)
-    return outputs.tolist()
-
-
-@app.route('/predict', methods=['POST'])
-def predict():
-    if request.method == 'POST':
-        # file = request.files['file']
-        # img_bytes = file.read()
-        img_bytes = json.loads(request.data['file'])
-        # 2
-
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/testpost', methods=['POST'])
+def testpost2(): 
+    if request.method == 'POST':
+        url = request.json['url']
+        response = requests.get(url)
+        file = open('test.png',"wb")
+        file.write(response.content)
+        file.close()
+        print('Got img')
+    return 'OK'
 
 if __name__ == '__main__':
     app.run(debug=True)

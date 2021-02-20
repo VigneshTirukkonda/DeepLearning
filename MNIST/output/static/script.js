@@ -11,8 +11,8 @@ let lastX = 0;
 let lastY = 0;
 
 // Load our model.
-// const sess = new onnx.InferenceSession();
-// const loadingModelPromise = sess.loadModel("./onnx_model.onnx");
+const sess = new onnx.InferenceSession();
+const loadingModelPromise = sess.loadModel("../static/CNN-2021-02-14 13:45:49.382405.onnx");
 
 // Add 'Draw a number here!' to the canvas.
 ctx.lineWidth = 28;
@@ -38,6 +38,7 @@ function clearCanvas() {
 
 function drawLine(fromX, fromY, toX, toY) {
   // Draws a line from (fromX, fromY) to (toX, toY).
+  ctx.lineWidth = 20;
   ctx.beginPath();
   ctx.moveTo(fromX, fromY);
   ctx.lineTo(toX, toY);
@@ -49,26 +50,13 @@ function drawLine(fromX, fromY, toX, toY) {
 async function updatePredictions() {
   // Get the predictions for the canvas data.
   const imgData = ctx.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-  // const input = new onnx.Tensor(new Float32Array(imgData.data), "float32");
+  const input = new onnx.Tensor(new Float32Array(imgData.data), "float32");
 
-  // const outputMap = await sess.run([input]);
-  // const outputTensor = outputMap.values().next().value;
-  // const predictions = outputTensor.data;
-  // const maxPrediction = Math.max(...predictions);
-
-//   $.post( "/predict", files={"file": imgData});
-    var files = {'file':imgData};
-    // $.ajax({
-    //     url: 'http://localhost:5000/predict',
-    //     type: 'POST',
-    //     data: {'file':imgData},   // converts js value to JSON string
-    //     })
-    // .done((result) => {
-    //         console.log(result); // do whatever with it. In this case see it in console
-    //     })
-  const predictions = [0,0,0,0,0,0,0,0,0,0];
+  const outputMap = await sess.run([input]);
+  const outputTensor = outputMap.values().next().value;
+  var predictions = outputTensor.data;
   const maxPrediction = Math.max(...predictions);
-
+  // predictions = predictions.map(v => v/maxPrediction)
 
   for (let i = 0; i < predictions.length; i++) {
     const element = document.getElementById(`prediction-${i}`);
@@ -125,13 +113,13 @@ function bodyMouseOut(event) {
   }
 }
 
-window.addEventListener('load', () => {
-  canvas.addEventListener("mousedown", canvasMouseDown);
-  canvas.addEventListener("mousemove", canvasMouseMove);
-  document.body.addEventListener("mouseup", bodyMouseUp);
-  document.body.addEventListener("mouseout", bodyMouseOut);
-  clearButton.addEventListener("mousedown", clearCanvas);
+loadingModelPromise.then(() => {
+    canvas.addEventListener("mousedown", canvasMouseDown);
+    canvas.addEventListener("mousemove", canvasMouseMove);
+    document.body.addEventListener("mouseup", bodyMouseUp);
+    document.body.addEventListener("mouseout", bodyMouseOut);
+    clearButton.addEventListener("mousedown", clearCanvas);
 
-  ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-  ctx.fillText("Draw a number here!", CANVAS_SIZE / 2, CANVAS_SIZE / 2);
-});
+    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    ctx.fillText("Draw a number here!", CANVAS_SIZE / 2, CANVAS_SIZE / 2);
+  });
