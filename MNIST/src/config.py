@@ -4,7 +4,7 @@
 
 ROOT = '../Input'
 MODEL_PATH = '../Input/Model'
-LATEST_MODEL = '/CNN-2021-02-14 13:45:49.382405.pt'
+LATEST_MODEL = '/CNN-2021-02-26 02:47:01.247436.pt'
 
 TEST_PATH = '../Input/TEST'
 
