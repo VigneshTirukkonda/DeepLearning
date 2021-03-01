@@ -1,5 +1,4 @@
-from torch import device
-
+import torch
 DATAROOT = '../input'
 
 # DEVICE AND GPU SPECS
