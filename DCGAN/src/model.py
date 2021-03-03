@@ -16,17 +16,17 @@ class Discriminator(nn.Module):
 
             # stage shape (ndf) x 14 x 14
             nn.Conv2d(config.NDF, config.NDF * 2, kernel_size=4, stride=2, padding=1),
-            nn.BatchNorm2d(config.NDF * 2),
+            # nn.BatchNorm2d(config.NDF * 2),
             nn.LeakyReLU(0.2, inplace=True),
 
             # stage shape (ndf x 2) x 7 x 7
             nn.Conv2d(config.NDF * 2, config.NDF * 4, kernel_size=3, stride=2, padding=0),
-            nn.BatchNorm2d(config.NDF * 4),
+            # nn.BatchNorm2d(config.NDF * 4),
             nn.LeakyReLU(0.2, inplace=True),
 
             # stage shape (ndf x 4) x 3 x 3
             nn.Conv2d(config.NDF * 4, config.NC, kernel_size= 3, stride=1, padding=0),
-            nn.BatchNorm2d(config.NC),
+            # nn.BatchNorm2d(config.NC),
             nn.LeakyReLU(0.2, inplace=True),
 
             nn.Sigmoid()            

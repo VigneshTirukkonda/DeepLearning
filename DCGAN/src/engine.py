@@ -15,12 +15,6 @@ def train(criterion, optimizer, models):
     # img_list = []
     # G_losses = []
     # D_losses = []
-    # iters = 0
-    # netG, netD = models
-
-    # print('Starting training loop...')
-    # for epoch in tqdm(range(config.NUM_EPOCHS)):
-    #     netD.zero_grad()
     pass
 
 if __name__=='__main__':
@@ -44,13 +38,15 @@ if __name__=='__main__':
     D_losses = []
     iters = 0
 
+    criterion = torch.nn.BCELoss()
+
     optimizerD = optim.Adam(netD.parameters(), lr=config.LR, betas=(config.BETA1, 0.999))
     optimizerG = optim.Adam(netG.parameters(), lr=config.LR, betas=(config.BETA1, 0.999))
 
     print('Starting training loop...')
-    for epoch in tqdm(range(config.NUM_EPOCHS)):
+    for epoch in range(config.NUM_EPOCHS):
         
-        for i, data in tqdm(enumerate(dloader, 0)):
+        for i, data in enumerate(dloader, 0):
             
             ## Update D Network: maximçize log((D(x))) + log(1 - D(G(z)))
 
@@ -58,6 +54,7 @@ if __name__=='__main__':
             netD.zero_grad()
 
             real_cpu = data[0].to(config.DEVICE)
+            b_size = real_cpu.size(0)
             label = torch.full((b_size,), real_label, dtype=torch.float, device=config.DEVICE)
             
             output = netD(real_cpu).view(-1)
@@ -67,7 +64,7 @@ if __name__=='__main__':
             D_x = output.mean().item()
 
             ## Train with all-fake batch
-            noise = torch.randn(config.BATCH_SIZE, config.NZ, 1, 1, device=config.DEVICE)
+            noise = torch.randn(b_size, config.NZ, 1, 1, device=config.DEVICE)
 
             fake = netG(noise)
             label.fill_(fake_label)
@@ -93,15 +90,18 @@ if __name__=='__main__':
             optimizerG.step()
 
             # output training stats:
-            if i % 50 == 0:
-                print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f' % (epoch, num_epochs, i, len(dloader), errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
+            if i % 49 == 0:
+                print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f' % (epoch, config.NUM_EPOCHS, i, len(dloader)-1, errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
             
             G_losses.append(errG.item())
             D_losses.append(errD.item())
 
-            if (iters % 500 == 0) or ((epoch == config.NUM_EPOCHS-1) and (i == len(dloader)-1)):
+            if (iters % 499 == 0) or ((epoch == config.NUM_EPOCHS-1) and (i == len(dloader)-1)):
                 with torch.no_grad():
                     fake = netG(fixed_noise).detach().cpu()
                 img_list.append(utils.make_grid(fake, padding=2, normalize=True))
 
             iters += 1
+    
+    torch.save(netG.state_dict(), '/content/drive/MyDrive/Projects/DeepLearning/DCGAN/output/netG2.pt')
+    torch.save(netD.state_dict(), '/content/drive/MyDrive/Projects/DeepLearning/DCGAN/output/netD2.pt')
